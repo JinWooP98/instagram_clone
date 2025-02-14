@@ -11,6 +11,25 @@ let elements = {
     $fileInput: $modal.querySelector('#fileInput'),
 }
 
+// 모달 바디 스텝을 이동하는 함수
+function goToStep(step) {
+    // 기존 스텝 컨테이너의 active를 제거하고 해당 step컨테이너에 active부여
+    [...$modal.querySelectorAll('.step')].forEach(($stepContainer, index) => {
+        // // 기존 class active remove
+        // if ($stepContainer.classList.contains('active')) {
+        //     $stepContainer.classList.remove('active');
+        // }
+        // // 다음 step active add
+        // if(step === index + 1) {
+        //     $stepContainer.classList.add('active');
+        // }
+
+        //toggle은 첫번째 파라미터의 클래스가 존재하면 없애고 존재하지 않으면 붙여주는 기능을 함
+        // 두번째 파라미터는 true / false 여부에 따라 클래스를 붙여줄지 안붙여줄지 정해주는 기능이다.
+        $stepContainer.classList.toggle('active', step === index + 1);
+    });
+}
+
 // 파일 업로드 관련 이벤트 함수
 function setUpFileUploadEvents () {
 
@@ -39,6 +58,9 @@ function setUpFileUploadEvents () {
             }
             return true;
         })
+
+        // 모달 step 2로 이동
+        goToStep(2);
 
     }
 
