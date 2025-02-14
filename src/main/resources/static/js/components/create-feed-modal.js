@@ -9,10 +9,16 @@ let elements = {
     $backdrop: $modal.querySelector('.modal-backdrop'),
     $uploadBtn: $modal.querySelector('.upload-button'),
     $fileInput: $modal.querySelector('#fileInput'),
+    $backStepBtn: $modal.querySelector('.back-button'),
+    $nextStepBtn: $modal.querySelector('.next-button'),
+    $modalTitle: $modal.querySelector('.modal-title'),
 }
 
 // 모달 바디 스텝을 이동하는 함수
 function goToStep(step) {
+
+    const {$backStepBtn, $nextStepBtn, $modalTitle} = elements;
+
     // 기존 스텝 컨테이너의 active를 제거하고 해당 step컨테이너에 active부여
     [...$modal.querySelectorAll('.step')].forEach(($stepContainer, index) => {
         // // 기존 class active remove
@@ -28,6 +34,20 @@ function goToStep(step) {
         // 두번째 파라미터는 true / false 여부에 따라 클래스를 붙여줄지 안붙여줄지 정해주는 기능이다.
         $stepContainer.classList.toggle('active', step === index + 1);
     });
+
+    if(step === 1) {
+        $nextStepBtn.style.display = 'none';
+        $backStepBtn.style.display = 'hidden';
+        $modalTitle.textContent = '새 게시물 만들기';
+    } else if (step === 2) {
+        $nextStepBtn.style.display = 'block';
+        $backStepBtn.style.visibility = 'visible';
+        $modalTitle.textContent = '편집';
+        $nextStepBtn.textContent = '다음';
+    } else if (step === 3) {
+        $nextStepBtn.textContent = '공유하기';
+        $modalTitle.textContent = '새 게시물 만들기';
+    }
 }
 
 // 파일 업로드 관련 이벤트 함수
