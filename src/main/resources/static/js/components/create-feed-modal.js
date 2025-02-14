@@ -4,6 +4,9 @@ import CarouselManager from "../ui/CarouselManager.js";
 // step 모듈내에서 전역관리
 let currentStep = 1;
 
+let step2Carousel = null;
+let step3Carousel = null;
+
 // 피드 생성 모달을 전역관리
 let $modal = document.getElementById("createPostModal");
 
@@ -25,7 +28,7 @@ function goToStep(step) {
 
     currentStep = step;
 
-    const {$backStepBtn, $nextStepBtn, $modalTitle} = elements;
+    const {$backStepBtn, $nextStepBtn, $modalTitle, $fileInput} = elements;
 
     // 기존 스텝 컨테이너의 active를 제거하고 해당 step컨테이너에 active부여
     [...$modal.querySelectorAll('.step')].forEach(($stepContainer, index) => {
@@ -44,6 +47,7 @@ function goToStep(step) {
     });
 
     if(step === 1) {
+        $fileInput.value = ''; // 다음번 change이벤트 발동을 위한 리셋
         $nextStepBtn.style.display = 'none';
         $backStepBtn.style.display = 'hidden';
         $modalTitle.textContent = '새 게시물 만들기';
@@ -87,14 +91,18 @@ function setUpFileUploadEvents () {
             return true;
         });
 
-        // 이미지 슬라이드 생성
-        const step2Carousel = new CarouselManager($modal.querySelector('.preview-container'));
+        // 이미 생성되어있다면, 그냥 init()만 다시 호출해서 '슬라이드 목록'만 업데이트
+        if(step2Carousel && step3Carousel) {
+            step2Carousel.init(validFiles);
+            step3Carousel.init(validFiles);
+        } else {
+            // 이미지 슬라이드 생성
+            step2Carousel = new CarouselManager($modal.querySelector('.preview-container'));
+            step3Carousel = new CarouselManager($modal.querySelector('.write-container'));
 
-        step2Carousel.init(validFiles);
-
-        const step3Carousel = new CarouselManager($modal.querySelector('.write-container'));
-
-        step3Carousel.init(validFiles);
+            step2Carousel.init(validFiles);
+            step3Carousel.init(validFiles);
+        }
 
         // 모달 step 2로 이동
         goToStep(2);
@@ -135,6 +143,8 @@ function setUpModalEvents () {
 
         $modal.style.display = 'none';
         document.body.style.overflow = 'auto'; // 모달 닫을시 배경 바디 스크롤 방지 해제
+
+        goToStep(1);
     }
 
     // 피드 생성 모달 열기 이벤트

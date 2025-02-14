@@ -36,7 +36,8 @@ class CarouselManager {
     // 초기 이미지파일 배열 받기
     init(files) {
         this.slides = files;
-
+        // 슬라이드를 0번으로 다시 세팅
+        this.goToSlide(0);
         // 슬라이드 띄우기
         this.setUpPreview();
     }
@@ -46,7 +47,10 @@ class CarouselManager {
         // 이미지 트랙 리셋
         this.track.innerHTML = '';
 
+        this.indicatorContainer.innerHTML = '';
+
         this.slides.forEach((file, index) => {
+
             // 이미지 생성
             const $img = document.createElement('img');
             // raw file을 imgae url로 변환
@@ -65,6 +69,7 @@ class CarouselManager {
     }
 
     makeIndicator(index) {
+
         const $indicator = document.createElement('span');
         $indicator.classList.add('indicator');
 
@@ -75,15 +80,22 @@ class CarouselManager {
 
     // 슬라이드 X축 이동함수
     goToSlide(index) {
-        if(index < 0) index = this.slides.length - 1;
-
-        if(index > this.slides.length -1) index = 0;
+        if(index < 0 || index > this.slides.length -1) return;
 
         // 현재 인덱스 갱신
         this.currentIndex = index;
 
         // 트랙 이동
         this.track.style.transform = `translateX(-${index * 100}%)`;
+
+        // 이전, 다음 슬라이드 버큰 활성화 여부
+        this.prevBtn.style.display = index === 0 ? 'none' : 'flex';
+        this.nextBtn.style.display = index === this.slides.length - 1 ? 'none' : 'flex';
+
+        // 인디케이터 변화
+        [...this.indicatorContainer.children].forEach(($ind, i) => {
+            $ind.classList.toggle("active", i === index);
+        });
     }
 
 }
