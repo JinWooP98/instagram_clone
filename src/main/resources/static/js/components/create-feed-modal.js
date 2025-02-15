@@ -20,6 +20,8 @@ let elements = {
     $nextStepBtn: $modal.querySelector('.next-button'),
     $modalTitle: $modal.querySelector('.modal-title'),
     $uploadArea: $modal.querySelector('.upload-area'), // 드래그 영역
+    $contentTextarea: $modal.querySelector('.content-input textarea'),
+    $charCounter: $modal.querySelector('.char-counter'),
 }
 
 // 모달 바디 스텝을 이동하는 함수
@@ -117,6 +119,7 @@ function setUpFileUploadEvents () {
 
     // 업로드 버튼을 누르면 파일 선택창이 대신 눌리도록 조작
     $uploadBtn.addEventListener('click', e => {
+        e.preventDefault();
         $fileInput.click();
     });
 
@@ -199,10 +202,30 @@ function setUpModalEvents () {
     });
 }
 
+// 피드 내용 입력 이벤트
+function setUpTextareaEvents() {
+
+    const {$contentTextarea, $charCounter} = elements;
+
+    $contentTextarea.addEventListener('input', () => {
+        const length = $contentTextarea.value.length;
+        $charCounter.textContent = `${length.toString()} / 2,200`;
+
+        if (length > 2200) {
+            $charCounter.classList.add('exceed');
+            $contentTextarea.value = $contentTextarea.value.slice(0, 2200);
+        } else {
+            $charCounter.classList.remove('exceed');
+        }
+    });
+
+};
+
 // 이벤트 바인딩 관련 함수
 function bindEvents () {
-    setUpModalEvents();
-    setUpFileUploadEvents();
+    setUpModalEvents(); // 모달 관련 이벤트
+    setUpFileUploadEvents(); // 파일 업로드 관련 이벤트
+    setUpTextareaEvents(); // 텍스트 관련 이벤트
 }
 
 // 모달 관련 JS 함수 - 외부에 노출
