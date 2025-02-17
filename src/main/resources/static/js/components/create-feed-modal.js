@@ -19,6 +19,9 @@ let elements = {
     $backStepBtn: $modal.querySelector('.back-button'),
     $nextStepBtn: $modal.querySelector('.next-button'),
     $modalTitle: $modal.querySelector('.modal-title'),
+    $uploadArea: $modal.querySelector('.upload-area'), // 드래그 영역
+    $contentTextarea: $modal.querySelector('.content-input textarea'),
+    $charCounter: $modal.querySelector('.char-counter'),
 }
 
 // 모달 바디 스텝을 이동하는 함수
@@ -62,10 +65,27 @@ function goToStep(step) {
     }
 }
 
+// 파일을 검사하는 함수
+const validateFiles = files => {
+    return files.filter(file => {
+        if(!file.type.startsWith('image')) {
+            alert(`${file.name}은(는) 이미지가 아닙니다.`);
+            return false;
+        }
+        return true;
+    }).filter(file => {
+        if(file.size > 10 * 1024 * 1024) {
+            alert(`${file.name}은(는) 10MB를 초과합니다.`);
+            return false;
+        }
+        return true;
+    });
+};
+
 // 파일 업로드 관련 이벤트 함수
 function setUpFileUploadEvents () {
 
-    const {$uploadBtn, $fileInput} = elements;
+    const {$uploadBtn, $fileInput, $uploadArea} = elements;
 
     // 파일을 검사하고 다음 단계로 이동하는 함수
     const handleFiles = files => {
@@ -75,21 +95,9 @@ function setUpFileUploadEvents () {
             return;
         }
 
-        // 파일이 이미지인지 확인
-        // 이미지이고 크기가 10MB 이하인 파일들만 validFiles 에 저장
-        const validFiles = files.filter(file => {
-            if(!file.type.startsWith('image')) {
-                alert(`${file.name}은(는) 이미지가 아닙니다.`);
-                return false;
-            }
-            return true;
-        }).filter(file => {
-            if(file.size > 10 * 1024 * 1024) {
-                alert(`${file.name}은(는) 10MB를 초과합니다.`);
-                return false;
-            }
-            return true;
-        });
+        // // 파일이 이미지인지 확인
+        // // 이미지이고 크기가 10MB 이하인 파일들만 validFiles 에 저장
+        const validFiles = validateFiles(files);
 
         // 이미 생성되어있다면, 그냥 init()만 다시 호출해서 '슬라이드 목록'만 업데이트
         if(step2Carousel && step3Carousel) {
@@ -111,18 +119,40 @@ function setUpFileUploadEvents () {
 
     // 업로드 버튼을 누르면 파일 선택창이 대신 눌리도록 조작
     $uploadBtn.addEventListener('click', e => {
+        e.preventDefault();
         $fileInput.click();
     });
 
     // 파일 선택이 끝났을 때 파일정보를 읽는 이벤트
     $fileInput.addEventListener('change', e => {
+        e.preventDefault();
         const files = [...e.target.files];
 
         if(files.length > 0) {
             handleFiles(files);
         }
 
-    })
+    });
+
+    // 파일 드래그& 드롭 이벤트
+    // 드래그 영역에 진입했을 때
+    $uploadArea.addEventListener('dragover', e => {
+        e.preventDefault();
+        $uploadArea.classList.add('dragover');
+    });
+    // 드래그 영역에서 나갔을 때
+    $uploadArea.addEventListener('dragleave', e => {
+        e.preventDefault();
+        $uploadArea.classList.remove('dragover');
+    });
+    // 드래그 영역에 드롭했을 때
+    $uploadArea.addEventListener('drop', e => {
+       e.preventDefault(); // 드롭했을 때 이미지 새탭이 열리거나 파일이 다운로드되는 것을 방지
+
+        // 파일 정보 얻어오기
+        const files = [...e.dataTransfer.files];
+        if(files.length > 0) handleFiles(files);
+    });
 }
 
 // 피드 생성 모달 관련 이벤트 함수
@@ -172,10 +202,30 @@ function setUpModalEvents () {
     });
 }
 
+// 피드 내용 입력 이벤트
+function setUpTextareaEvents() {
+
+    const {$contentTextarea, $charCounter} = elements;
+
+    $contentTextarea.addEventListener('input', () => {
+        const length = $contentTextarea.value.length;
+        $charCounter.textContent = `${length.toString()} / 2,200`;
+
+        if (length > 2200) {
+            $charCounter.classList.add('exceed');
+            $contentTextarea.value = $contentTextarea.value.slice(0, 2200);
+        } else {
+            $charCounter.classList.remove('exceed');
+        }
+    });
+
+};
+
 // 이벤트 바인딩 관련 함수
 function bindEvents () {
-    setUpModalEvents();
-    setUpFileUploadEvents();
+    setUpModalEvents(); // 모달 관련 이벤트
+    setUpFileUploadEvents(); // 파일 업로드 관련 이벤트
+    setUpTextareaEvents(); // 텍스트 관련 이벤트
 }
 
 // 모달 관련 JS 함수 - 외부에 노출
