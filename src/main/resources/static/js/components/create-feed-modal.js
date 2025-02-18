@@ -22,6 +22,9 @@ let elements = {
     $uploadArea: $modal.querySelector('.upload-area'), // 드래그 영역
     $contentTextarea: $modal.querySelector('.content-input textarea'),
     $charCounter: $modal.querySelector('.char-counter'),
+    $nestedModal: $modal.querySelector('.nested-modal'),
+    $deleteBtn: $modal.querySelector('.delete-button'),
+    $cancelBtn: $modal.querySelector('.cancel-button'),
 }
 
 // 모달 바디 스텝을 이동하는 함수
@@ -158,7 +161,7 @@ function setUpFileUploadEvents () {
 // 피드 생성 모달 관련 이벤트 함수
 function setUpModalEvents () {
 
-    const {$closeBtn, $backdrop, $backStepBtn, $nextStepBtn} = elements;
+    const {$closeBtn, $backdrop, $backStepBtn, $nextStepBtn, $nestedModal} = elements;
 
     // 모달 열기
     const openModal = e => {
@@ -171,10 +174,16 @@ function setUpModalEvents () {
     const closeModal = e => {
         e.preventDefault();
 
+        // step2 부터는 모달을 닫으면 안됨. 대신 새로운 모달을 띄워야 함
+        if(currentStep >= 2) {
+            // 중첩 모달 띄우기
+            $nestedModal.style.display = 'flex';
+            return;
+        }
+
         $modal.style.display = 'none';
         document.body.style.overflow = 'auto'; // 모달 닫을시 배경 바디 스크롤 방지 해제
 
-        goToStep(1);
     }
 
     // 피드 생성 모달 열기 이벤트
@@ -219,13 +228,30 @@ function setUpTextareaEvents() {
         }
     });
 
-};
+}
+
+// 피드 모달 닫을 때 삭제 취소 관련
+function setUpNestedModalEvents() {
+    const {$nestedModal, $deleteBtn, $cancelBtn} = elements;
+
+    // 취소처리 - 중첩모달만 닫기
+    $cancelBtn.addEventListener('click', () => {
+        $nestedModal.style.display = 'none';
+    });
+
+    // 삭제처리 - 모든 모달을 닫고 초기상태로 귀한
+    $deleteBtn.addEventListener('click', () => {
+        // 새로고침시 모든것이 초기로 돌아감
+        window.location.reload();
+    })
+}
 
 // 이벤트 바인딩 관련 함수
 function bindEvents () {
     setUpModalEvents(); // 모달 관련 이벤트
     setUpFileUploadEvents(); // 파일 업로드 관련 이벤트
     setUpTextareaEvents(); // 텍스트 관련 이벤트
+    setUpNestedModalEvents(); // 중첩 모달 관련 이벤트
 }
 
 // 모달 관련 JS 함수 - 외부에 노출
