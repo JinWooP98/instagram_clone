@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.instagramclone.repository.PostRepository">
+    <!--  피드 저장  -->
+    <!--  insert만 특별하게 auto increment로 지정한 key를 지정해줌  -->
+    <insert id="saveFeed" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO posts
+            (content, writer)
+        VALUES
+            (#{content}, #{writer})
+    </insert>
+
+    <!--  피드 이미지 저장  -->
+    <insert id="saveFeedImage" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO post_images
+            (post_id, image_url, image_order)
+        VALUES
+            (#{postId}, #{imageUrl}, #{imageOrder})
+    </insert>
+
+    <!--  특정 피드에 첨부된 이미지 목록 조회  -->
+    <select id="findImagesByPostId" resultType="PostImage">
+        SELECT
+            *
+        FROM post_images
+        WHERE post_id = #{postId}
+        ORDER BY image_order
+    </select>
+
+    <!--  피드 가져오기  -->
+    <select id="findAll" resultType="Post">
+        SELECT
+            *
+        FROM posts
+        ORDER BY created_at DESC
+    </select>
+
+</mapper>
