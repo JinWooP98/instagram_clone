@@ -83,7 +83,7 @@ const validateFiles = files => {
         }
         return true;
     });
-};
+}
 
 // 파일 업로드 관련 이벤트 함수
 function setUpFileUploadEvents () {
