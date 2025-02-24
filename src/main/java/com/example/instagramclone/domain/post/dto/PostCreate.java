@@ -1,6 +1,7 @@
 package com.example.instagramclone.domain.post.dto;
 
 
+import com.example.instagramclone.domain.post.entity.Post;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -18,4 +19,12 @@ public class PostCreate {
 
     @Size(max = 2200, message = "피드 내용은 최대 2200자까지 입력 가능합니다.")
     private String content;
+
+    // 엔터티 변환 편의 메서드
+    public Post toEntity() {
+        return Post.builder()
+                .writer(this.writer)
+                .content(this.content)
+                .build();
+    }
 }
