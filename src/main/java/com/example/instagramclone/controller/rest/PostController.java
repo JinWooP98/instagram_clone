@@ -1,6 +1,8 @@
 package com.example.instagramclone.controller.rest;
 
 import com.example.instagramclone.domain.post.dto.PostCreate;
+import com.example.instagramclone.exception.ErrorCode;
+import com.example.instagramclone.exception.PostException;
 import com.example.instagramclone.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
+
 
 
 /**
@@ -57,6 +61,11 @@ public class PostController {
             @RequestPart("images") List<MultipartFile> images
     ) {
 
+        // 파일 업로드 개수 검증
+        if(images.size() > 10) {
+            throw new PostException(ErrorCode.TOO_MANY_FILES, "파일의 개수는 10개를 초과할 수 없습니다.");
+        }
+
         images.forEach(image -> {
             log.info("uploaded image file name - {}", image.getOriginalFilename());
         });
@@ -68,9 +77,15 @@ public class PostController {
 
         Long newFeedPostId = postService.createFeed(postCreate);
 
+        // 응답 메시지 JSON 생성 {"id": 23, "message": "save success"}
+        Map<String, Object> response = Map.of(
+                "id", newFeedPostId,
+                "message", "feed created"
+        );
+
 
         return ResponseEntity
                 .ok()
-                .body("success to create feed : id - " + newFeedPostId);
+                .body(response);
     }
 }
