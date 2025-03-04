@@ -1,4 +1,4 @@
-package com.example.instagramclone.domain.post.dto;
+package com.example.instagramclone.domain.post.dto.request;
 
 
 import com.example.instagramclone.domain.post.entity.Post;
