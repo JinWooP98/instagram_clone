@@ -80,7 +80,7 @@ public class PostController {
         // 응답 메시지 JSON 생성 {"id": 23, "message": "save success"}
         Map<String, Object> response = Map.of(
                 "id", newFeedPostId,
-                "message", "feed created"
+                "message", "save success"
         );
 
 
