@@ -59,6 +59,9 @@ public class PostController {
     public ResponseEntity<?> getFeeds() {
         List<PostResponse> allFeeds = postService.findAllFeeds();
 
+        log.info("All feeds found");
+        // test
+
         return ResponseEntity
                 .ok()
                 .body(allFeeds);
