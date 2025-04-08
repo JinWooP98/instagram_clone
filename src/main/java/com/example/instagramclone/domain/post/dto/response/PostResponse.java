@@ -1,7 +1,6 @@
 package com.example.instagramclone.domain.post.dto.response;
 
 import com.example.instagramclone.domain.post.entity.Post;
-import com.example.instagramclone.domain.post.entity.PostImage;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
