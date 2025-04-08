@@ -1,6 +1,8 @@
 package com.example.instagramclone.service;
 
-import com.example.instagramclone.domain.post.dto.PostCreate;
+import com.example.instagramclone.domain.post.dto.request.PostCreate;
+import com.example.instagramclone.domain.post.dto.response.PostImageResponse;
+import com.example.instagramclone.domain.post.dto.response.PostResponse;
 import com.example.instagramclone.domain.post.entity.Post;
 import com.example.instagramclone.domain.post.entity.PostImage;
 import com.example.instagramclone.repository.PostRepository;
@@ -10,7 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -19,6 +23,19 @@ public class PostService {
 
     private final PostRepository postRepository; // db에 피드내용 저장, 이미지저장
     private final FileUploadUtil fileUploadUtil; // 로컬서버에 이미지 저장
+
+    // 피드 목록조회 중간처리
+    public List<PostResponse> findAllFeeds() {
+
+        return postRepository.findAll()
+                .stream()
+                .map(feed -> {
+                    feed.setImages(postRepository.findImagesByPostId(feed.getId()));
+                    return PostResponse.from(feed);
+                })
+                .collect(Collectors.toList());
+
+    }
 
     // 피드 생성 DB가기 전 후 중간처리
     public Long createFeed(PostCreate postCreate) {
